@@ -1,4 +1,5 @@
 ﻿using Photocenter.Models.Entities;
+using Photocenter.Models.Enums;
 
 namespace Photocenter.Models.ViewModels
 {
@@ -7,6 +8,6 @@ namespace Photocenter.Models.ViewModels
         public int ClientId { get; set; } 
         public int ServiceId { get; set; }
         public DateTime Date { get; set; }
-        public string Status { get; set; }
+        public OrderStatus Status { get; set; } = OrderStatus.Created;
     }
 }

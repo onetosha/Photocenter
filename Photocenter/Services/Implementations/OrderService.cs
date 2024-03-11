@@ -12,12 +12,10 @@ namespace Photocenter.Services.Implementations
     {
         private readonly IOrderRepository _orderRepository;
         private readonly IServiceRepository _serviceRepository;
-        private readonly IClientRepository _clientRepository;
-        public OrderService(IOrderRepository orderRepository, IServiceRepository serviceRepository, IClientRepository clientRepository)
+        public OrderService(IOrderRepository orderRepository, IServiceRepository serviceRepository)
         {
             _orderRepository = orderRepository;
             _serviceRepository = serviceRepository;
-            _clientRepository = clientRepository;
         }
         public async Task<IBaseResponse<Order>> CreateOrder(OrderViewModel model)
         {
@@ -26,13 +24,25 @@ namespace Photocenter.Services.Implementations
             {
                 //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                 var service = await _serviceRepository.Get(model.ServiceId);
+                if (service == null)
+                {
+                    baseResponse.Description = "Object (service) not found";
+                    baseResponse.StatusCode = StatusCode.ObjectNotFound;
+                    return baseResponse;
+                }
+                var client = await _serviceRepository.Get(model.ClientId);
+                if (client == null)
+                {
+                    baseResponse.Description = "Object (client) not found";
+                    baseResponse.StatusCode = StatusCode.ObjectNotFound;
+                    return baseResponse;
+                }
                 var order = new Order()
                 {
                     ClientId = model.ClientId,
                     ServiceId = model.ServiceId,
                     Date = model.Date,
                     Amount = service.Price,
-                    Status = model.Status
                 };
                 await _orderRepository.Create(order);
                 baseResponse.Data = order;
@@ -76,12 +86,25 @@ namespace Photocenter.Services.Implementations
             var baseResponse = new BaseResponse<Order>();
             try
             {
-                //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                var service = await _serviceRepository.Get(model.ServiceId);
                 var order = await _orderRepository.Get(id);
                 if (order == null)
                 {
                     baseResponse.Description = "Object not found";
+                    baseResponse.StatusCode = StatusCode.ObjectNotFound;
+                    return baseResponse;
+                }
+                //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                var service = await _serviceRepository.Get(model.ServiceId);
+                if (service == null)
+                {
+                    baseResponse.Description = "Object (service) not found";
+                    baseResponse.StatusCode = StatusCode.ObjectNotFound;
+                    return baseResponse;
+                }
+                var client = await _serviceRepository.Get(model.ClientId);
+                if (client == null)
+                {
+                    baseResponse.Description = "Object (client) not found";
                     baseResponse.StatusCode = StatusCode.ObjectNotFound;
                     return baseResponse;
                 }

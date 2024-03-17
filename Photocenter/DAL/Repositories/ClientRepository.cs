@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Photocenter.DAL.Interfaces;
+using Photocenter.Helpers;
 using Photocenter.Models.Entities;
 
 namespace Photocenter.DAL.Repositories
@@ -27,7 +28,7 @@ namespace Photocenter.DAL.Repositories
 
         public async Task<Client> Get(int id)
         {
-            return await _dbContext.Clients.FirstOrDefaultAsync(x => x.ID == id);
+            return await _dbContext.Clients.FirstOrDefaultAsync(x => x.Id == id);
         }
 
         public async Task<List<Client>> GetAll()

@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Photocenter.Models.Entities;
 
-namespace Photocenter.DAL
+namespace Photocenter.Helpers
 {
     public class ApplicationDBContext : DbContext
     {

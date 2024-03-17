@@ -24,7 +24,7 @@ namespace Photocenter.Controllers
             }
             return BadRequest(response);
         }
-        [HttpPost("delete")]
+        [HttpPost("delete/{id}")]
         public async Task<IActionResult> Delete(int id)
         {
             var response = await _orderService.DeleteOrder(id);
@@ -55,7 +55,7 @@ namespace Photocenter.Controllers
             }
             return BadRequest(response);
         }
-        [HttpPost("edit")]
+        [HttpPost("edit/{id}")]
         public async Task<IActionResult> Edit(int id, [FromBody] OrderViewModel model)
         {
             var response = await _orderService.EditOrder(id, model);

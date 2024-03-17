@@ -12,10 +12,12 @@ namespace Photocenter.Services.Implementations
     {
         private readonly IOrderRepository _orderRepository;
         private readonly IServiceRepository _serviceRepository;
-        public OrderService(IOrderRepository orderRepository, IServiceRepository serviceRepository)
+        private readonly IClientRepository _clientRepository;
+        public OrderService(IOrderRepository orderRepository, IServiceRepository serviceRepository, IClientRepository clientRepository)
         {
             _orderRepository = orderRepository;
             _serviceRepository = serviceRepository;
+            _clientRepository = clientRepository;
         }
         public async Task<IBaseResponse<Order>> CreateOrder(OrderViewModel model)
         {
@@ -30,7 +32,7 @@ namespace Photocenter.Services.Implementations
                     baseResponse.StatusCode = StatusCode.ObjectNotFound;
                     return baseResponse;
                 }
-                var client = await _serviceRepository.Get(model.ClientId);
+                var client = await _clientRepository.Get(model.ClientId);
                 if (client == null)
                 {
                     baseResponse.Description = "Object (client) not found";
@@ -43,6 +45,7 @@ namespace Photocenter.Services.Implementations
                     ServiceId = model.ServiceId,
                     Date = model.Date,
                     Amount = service.Price,
+                    Status = model.Status
                 };
                 await _orderRepository.Create(order);
                 baseResponse.Data = order;
@@ -101,7 +104,7 @@ namespace Photocenter.Services.Implementations
                     baseResponse.StatusCode = StatusCode.ObjectNotFound;
                     return baseResponse;
                 }
-                var client = await _serviceRepository.Get(model.ClientId);
+                var client = await _clientRepository.Get(model.ClientId);
                 if (client == null)
                 {
                     baseResponse.Description = "Object (client) not found";
@@ -131,6 +134,8 @@ namespace Photocenter.Services.Implementations
             try
             {
                 var order = await _orderRepository.Get(id);
+                order.Client = await _clientRepository.Get(order.ClientId);
+                order.Service = await _serviceRepository.Get(order.ServiceId);
                 if (order == null)
                 {
                     baseResponse.Description = "Object not found";
@@ -154,6 +159,12 @@ namespace Photocenter.Services.Implementations
             try
             {
                 var orderList = await _orderRepository.GetAll();
+                foreach ( var order in orderList ) 
+                {
+                    //ОПТИМИЗИРОВАТЬ
+                    order.Client = await _clientRepository.Get(order.ClientId);
+                    order.Service = await _serviceRepository.Get(order.ServiceId);
+                }
                 if (orderList.Count == 0)
                 {
                     baseResponse.Description = "0 objects found";
